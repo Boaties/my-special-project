@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Rosé & Ritual Photo Booth</title>
+<title>GLAM CAM CLUB</title>
+<meta property="og:title" content="GLAM CAM CLUB">
+<meta property="og:description" content="Strike a pose in our little striped photo booth.">
+<meta property="og:type" content="website">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Pinyon+Script&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <!--
 =====================================================================
@@ -305,7 +308,7 @@ let stream=null,frame=CONFIG.defaultFrame,filter='none',timer=CONFIG.defaultTime
 const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#fff';
 const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)};
 
-$('brandName').textContent=CONFIG.brandName;document.title=CONFIG.brandName+" Photo Booth";
+$('brandName').textContent=CONFIG.brandName;document.title=CONFIG.brandName+document.title=CONFIG.brandName;
 $('heroTitle').textContent=CONFIG.heroTitle;$('heroSub').textContent=CONFIG.heroSub;
 $('donateText').textContent=CONFIG.donateText;$('donateBtn').textContent=CONFIG.donateButtonLabel;
 /* ปุ่มบริจาค: มีลิงก์ = กดได้ / ไม่มีลิงก์ = แสดงเฉยๆ */
