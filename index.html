@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rosé & Ritual Photo Booth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Pinyon+Script&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<!--
+=====================================================================
+  คู่มือภาษาไทย: ไฟล์นี้แบ่งเป็น 4 ส่วนหลัก (กด Cmd+F แล้วค้นหาคำว่า "ส่วนที่")
+  ---------------------------------------------------------------
+  ส่วนที่ 1  CSS ตัวแปรสี/ฟอนต์   -> อยู่ในแท็ก <style> ด้านล่าง  (แก้สี ฟอนต์ ลายทาง)
+  ส่วนที่ 2  CONFIG               -> อยู่ในแท็ก <script> ด้านล่าง (แก้ข้อความ ลิงก์บริจาค อีเมล)
+  ส่วนที่ 3  FRAMES และ FILTERS   -> อยู่ในแท็ก <script> เช่นกัน   (แก้/เพิ่มเฟรมและฟิลเตอร์)
+  ส่วนที่ 4  ระบบการทำงาน          -> ท้ายไฟล์ ไม่ต้องแก้
+  ---------------------------------------------------------------
+  ข้อความที่เขียนตรงๆ ใน HTML (เช่น "Start camera", "Your photos", "Report a bug",
+  "Make it yours") แก้ได้เลย: กด Cmd+F ค้นหาข้อความนั้น แล้วพิมพ์ทับเป็นภาษาไทย
+  อย่าลบเครื่องหมาย < > " ที่อยู่รอบข้อความ
+=====================================================================
+-->
+<style>
+/* =====================================================================
+   ส่วนที่ 1: สี / ฟอนต์ / ขนาด  (แก้ตรงนี้เพื่อเปลี่ยนหน้าตาทั้งเว็บ)
+   วิธีแก้: เปลี่ยนเฉพาะรหัสสีหลังเครื่องหมาย : เช่น #59663f
+   หารหัสสีที่ชอบได้จากเว็บ colorhunt.co หรือพิมพ์ค้นหา "color picker"
+   ===================================================================== */
+:root{
+  --pink:#f8d3de;      /* สีพื้นหลังหลัก (ชมพูอ่อน) */
+  --pink-deep:#f2b5c8; /* ชมพูเข้ม ใช้กับปุ่มชัตเตอร์และจุดเน้น */
+  --green:#59663f;     /* สีเขียวเซจ ใช้กับแถบหัว กันสาด ปุ่มหลัก หัวข้อ */
+  --cream:#fbeee3;     /* สีครีม ใช้กับส่วนแกลเลอรี่ */
+  --lilac:#e3d3e8;     /* ม่วงไลแล็ก ใช้กับส่วนล่าง (บริจาค/แจ้งบัก) */
+  --sky:#bad0e0;       /* ฟ้าอมเทา ใช้คู่กับไลแล็กเป็นสีไล่เฉด */
+  --card:#ffffff;      /* สีการ์ดสีขาว (กล่องที่มีขอบดำ) */
+  --ink:#2a2a22;       /* สีตัวอักษร และสีขอบ/เงาของการ์ด */
+  --font-script:'Pinyon Script',cursive; /* ฟอนต์ลายมือ ใช้กับหัวข้อใหญ่ (ภาษาไทยจะใช้ฟอนต์สำรอง) */
+  --font-serif:'Cormorant Garamond',Georgia,serif; /* ฟอนต์หัวข้อรอง */
+  --font-sans:'DM Sans',system-ui,sans-serif; /* ฟอนต์ตัวอ่านทั่วไป */
+  --stripe:26px;       /* ความกว้างของลายทาง (ยิ่งเลขมาก ลายยิ่งใหญ่) */
+  --radius:18px;       /* ความโค้งมนของมุมการ์ด (0 = มุมเหลี่ยม) */
+}
+/* สีของโหมดมืด: ใช้เมื่อเครื่องผู้ใช้ตั้งค่าเป็น Dark Mode (ถ้าไม่ต้องการโหมดมืด ลบบล็อกนี้และบล็อกถัดไปได้) */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--pink:#3b2a31;--pink-deep:#6b4452;--cream:#2f2a27;--lilac:#352f3d;--sky:#2c3a46;--card:#221f1d;--ink:#f6e9e0;--green:#7b8a58}
+}
+:root[data-theme="dark"]{--pink:#3b2a31;--pink-deep:#6b4452;--cream:#2f2a27;--lilac:#352f3d;--sky:#2c3a46;--card:#221f1d;--ink:#f6e9e0;--green:#7b8a58}
+*{box-sizing:border-box;margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{background:var(--pink);color:var(--ink);font:400 16px/1.6 var(--font-sans);overflow-x:hidden}
+/* แถบลายทางเขียว-ชมพู บนสุดและล่างสุดของหน้า */
+.stripes{height:calc(var(--stripe)*.9);background:repeating-linear-gradient(90deg,var(--green) 0 var(--stripe),var(--pink) var(--stripe) calc(var(--stripe)*2))}
+/* กันสาดลายทางมีขอบหยัก ใต้แถบหัว */
+.awning{height:34px;background:repeating-linear-gradient(90deg,var(--green) 0 var(--stripe),var(--cream) var(--stripe) calc(var(--stripe)*2));-webkit-mask:radial-gradient(circle at var(--stripe) 0,#000 var(--stripe),transparent calc(var(--stripe) + 1px)) 0 100%/calc(var(--stripe)*2) 100%;mask:linear-gradient(#000,#000) top/100% 22px no-repeat,radial-gradient(circle at 50% 0,#000 60%,transparent 61%) bottom/calc(var(--stripe)*2) 14px repeat-x}
+/* แถบหัวเว็บสีเขียว (โลโก้ + เมนู) */
+header{background:var(--green);color:var(--cream);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px clamp(16px,5vw,48px);flex-wrap:wrap}
+.logo{font:600 1.5rem/1 var(--font-serif);letter-spacing:.22em}
+nav{display:flex;gap:22px;font:italic 500 1.1rem var(--font-serif)}
+nav a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus-visible{border-color:currentColor;outline:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
+.hero{text-align:center;padding:56px 0 28px}
+/* ข้อความต้อนรับตัวใหญ่ (ขนาดตัวอักษรแก้ที่เลข clamp) */
+.hero h1{font:400 clamp(3.2rem,11vw,6.4rem)/.95 var(--font-script);color:var(--green)}
+.hero p{font:italic 500 clamp(1.2rem,3vw,1.6rem)/1.4 var(--font-serif);max-width:34ch;margin:16px auto 0}
+/* การ์ดสีขาว ขอบดำ เงาแข็ง (สไตล์ Words with Wine) แก้ความหนาเงาที่ 0 6px 0 */
+.card{background:var(--card);border:1.5px solid var(--ink);border-radius:var(--radius);box-shadow:0 6px 0 var(--ink);padding:clamp(16px,3vw,28px)}
+.booth{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start;padding:16px 0 56px}
+@media(max-width:820px){.booth{grid-template-columns:1fr}}
+.screen{position:relative;aspect-ratio:4/5;border-radius:calc(var(--radius) - 4px);overflow:hidden;background:var(--lilac)}
+.screen video,.screen canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+video{transform:scaleX(-1)}
+#overlay{pointer-events:none}
+#count{position:absolute;inset:0;display:grid;place-items:center;font:400 9rem var(--font-script);color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.35);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .45s}
+.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font:italic 500 1.3rem/1.4 var(--font-serif)}
+.shutter-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:20px;flex-wrap:wrap}
+/* หน้าตาปุ่มทั้งหมด */
+button,.btn{font:700 .95rem var(--font-sans);cursor:pointer;border:1.5px solid var(--ink);border-radius:999px;padding:11px 22px;background:var(--card);color:var(--ink);text-decoration:none;display:inline-block;box-shadow:0 3px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+button:active,.btn:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+button:focus-visible,.btn:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.primary{background:var(--green);color:#fff}
+/* ปุ่มชัตเตอร์ถ่ายรูปทรงกลม (ขนาดแก้ที่ width/height) */
+#shutter{width:84px;height:84px;padding:0;border-radius:50%;background:var(--pink-deep);border:1.5px solid var(--ink);box-shadow:0 5px 0 var(--ink),inset 0 0 0 7px var(--card),inset 0 0 0 9px var(--ink)}
+#shutter:disabled{opacity:.5}
+h2{font:italic 600 2rem/1.1 var(--font-serif);color:var(--green);margin-bottom:10px}
+h3{font:600 .8rem var(--font-sans);letter-spacing:.05em;margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;font-weight:500;box-shadow:none}
+.chip[aria-pressed="true"]{background:var(--green);color:#fff}
+.side{display:grid;gap:22px}
+.band{padding:56px 0}
+.band.dream{background:linear-gradient(180deg,var(--sky),var(--lilac))}
+.band.cream{background:var(--cream)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+label{display:block;font-weight:500;font-size:.9rem;margin:10px 0 4px}
+select,input[type=text],input[type=email],textarea{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px}
+textarea{min-height:110px;resize:vertical}
+#gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;margin-top:14px}
+/* กรอบรูปแต่ละใบในแกลเลอรี่ */
+.shot{background:var(--card);border:1.5px solid var(--ink);border-radius:10px;padding:6px;box-shadow:0 4px 0 var(--ink)}
+.shot img{width:100%;display:block;border-radius:6px}
+.shot div{display:flex;gap:6px;margin-top:8px}
+.shot .btn,.shot button{flex:1;padding:6px 8px;font-size:.78rem;text-align:center;box-shadow:none}
+.hint{font-size:.85rem;opacity:.8}
+.donate{text-align:center}
+/* กรอบใส่ QR พร้อมเพย์ (พื้นขาวเสมอ เพื่อให้สแกนติดแม้ในโหมดมืด) */
+.qr{width:min(230px,72%);aspect-ratio:1;margin:0 auto 12px;border:1.5px solid var(--ink);border-radius:14px;background:#fff;color:#2a2a22;display:grid;place-items:center;overflow:hidden;padding:8px;font:italic 500 1rem/1.3 var(--font-serif)}
+.qr img{width:100%;height:100%;object-fit:contain;display:block}
+.qr.empty-slot{border-style:dashed;background:transparent;color:var(--ink);opacity:.7}
+/* ปุ่มที่ยังไม่มีลิงก์: ดูเหมือนปุ่มแต่กดไม่ได้ */
+.btn[aria-disabled="true"]{opacity:.65;cursor:default;box-shadow:none;pointer-events:none}
+.payee{font:italic 600 1.3rem var(--font-serif);margin:0 0 14px}
+.donate p{font:italic 500 1.25rem/1.4 var(--font-serif);margin:6px auto 16px;max-width:30ch}
+footer{background:var(--green);color:var(--cream);text-align:center;padding:26px 16px;font:italic 500 1.1rem var(--font-serif)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--card);padding:10px 20px;border-radius:999px;transition:transform .3s;z-index:9}
+#toast.on{transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<!-- ส่วนหัวเว็บ: โลโก้ (ชื่อแก้ที่ CONFIG > brandName) และลิงก์เมนู 4 อัน -->
+<div class="stripes"></div>
+<header>
+  <div class="logo" id="brandName"></div>
+  <nav><a href="#booth">Booth</a><a href="#gallery-sec">My photos</a><a href="#support">Support</a><a href="#bug">Report a bug</a></nav>
+</header>
+<div class="awning" aria-hidden="true"></div>
+
+<main>
+<!-- ส่วนต้อนรับ: ข้อความมาจาก CONFIG > heroTitle และ heroSub -->
+<section class="wrap hero">
+  <h1 id="heroTitle"></h1>
+  <p id="heroSub"></p>
+</section>
+
+<!-- ตัวตู้ถ่ายรูป: ซ้าย = จอกล้อง + ปุ่มชัตเตอร์ / ขวา = ตัวเลือกเฟรม ฟิลเตอร์ นับถอยหลัง -->
+<section class="wrap booth" id="booth">
+  <div class="card">
+    <div class="screen">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="still" hidden></canvas>
+      <canvas id="overlay" width="900" height="1125"></canvas>
+      <div class="empty" id="empty">Switch on the camera to step into the booth.</div>
+      <div id="count"></div>
+      <div id="flash"></div>
+    </div>
+    <div class="shutter-row">
+      <button id="camBtn" class="primary">Start camera</button>
+      <button id="shutter" aria-label="Take photo" disabled></button>
+      <label class="btn" style="margin:0;cursor:pointer">Upload a photo<input id="file" type="file" accept="image/*" hidden></label>
+    </div>
+    <p class="hint" style="text-align:center;margin-top:12px" id="camNote"></p>
+  </div>
+
+  <div class="side">
+    <div class="card">
+      <h2>Make it yours</h2>
+      <h3>Frame</h3><div class="chips" id="frameChips"></div>
+      <h3>Filter</h3><div class="chips" id="filterChips"></div>
+      <h3>Countdown</h3><div class="chips" id="timerChips"></div>
+    </div>
+  </div>
+</section>
+
+<!-- แกลเลอรี่รูปที่ถ่าย (เก็บไว้ในแท็บเบราว์เซอร์เท่านั้น) -->
+<section class="band cream" id="gallery-sec">
+  <div class="wrap">
+    <h2>Your photos</h2>
+    <p class="hint">Photos stay in this browser tab only. Download the ones you love before you leave.</p>
+    <div id="gallery"></div>
+    <p id="galleryEmpty" class="hint" style="margin-top:14px">Nothing here yet. Press the round button to take your first photo.</p>
+  </div>
+</section>
+
+<section class="band dream">
+  <div class="wrap grid2">
+    <!-- ส่วนบริจาค: ข้อความแก้ที่ CONFIG > donateText, ปุ่มแก้ที่ donateButtonLabel, ลิงก์แก้ที่ donateUrl -->
+    <div class="card donate" id="support">
+      <h2>Support the booth</h2>
+      <p id="donateText"></p>
+      <!-- ช่องใส่ QR พร้อมเพย์ (รูปมาจาก CONFIG > promptpayQr) -->
+      <div class="qr" id="qrBox" hidden></div>
+      <!-- ชื่อผู้รับเงิน (มาจาก CONFIG > recipientName) -->
+      <p class="payee" id="payee" hidden></p>
+      <!-- ปุ่มลิงก์บริจาค: ถ้า CONFIG > donateUrl ว่างอยู่ ปุ่มจะกดไม่ได้ -->
+      <a class="btn primary" id="donateBtn" target="_blank" rel="noopener"></a>
+    </div>
+    <!-- ฟอร์มแจ้งบัก: ส่งเข้าเซิร์ฟเวอร์ (ดูได้ที่ /admin.html) ตัวเลือกปัญหาแก้ได้ในแท็ก <option> ข้างล่าง -->
+    <div class="card" id="bug">
+      <h2>Report a bug</h2>
+      <label for="bugType">What happened?</label>
+      <select id="bugType"><option>Camera won't start</option><option>Photo looks wrong</option><option>Frame or filter problem</option><option>Something else</option></select>
+      <label for="bugDesc">Describe the problem</label>
+      <textarea id="bugDesc" placeholder="What did you click, and what did you expect to happen?"></textarea>
+      <label for="bugName">Your email (optional, so we can reply)</label>
+      <input id="bugName" type="email">
+      <div style="margin-top:14px"><button id="bugSend" class="primary">Send report</button></div>
+      <p class="hint" style="margin-top:8px">Your report goes straight to the site owner. Browser and device info are added automatically.</p>
+    </div>
+  </div>
+</section>
+</main>
+<div class="stripes"></div>
+<!-- ท้ายเว็บ: ข้อความแก้ที่ CONFIG > footerText -->
+<footer id="footer"></footer>
+<div id="toast" role="status"></div>
+
+<script>
+/* =====================================================================
+   ส่วนที่ 2: CONFIG  ข้อความ ลิงก์ อีเมล และตัวเลือกต่างๆ
+   วิธีแก้: เปลี่ยนเฉพาะข้อความที่อยู่ในเครื่องหมายคำพูด " "
+   ห้ามลบเครื่องหมายคำพูด และห้ามลบเครื่องหมายจุลภาค , ท้ายบรรทัด
+   ===================================================================== */
+const CONFIG = {
+  brandName: "Rosé & Ritual",   // ชื่อร้าน/ชื่อตู้ แสดงที่แถบหัวและชื่อแท็บ
+  // ข้อความใหญ่ตอนต้อนรับ และข้อความรองด้านล่าง
+  heroTitle: "Say cheese, darling",
+  heroSub: "Step into our little striped booth. Pick a frame, strike a pose, keep the memory.",
+  captionOnFrames: "Rosé & Ritual", // คำที่พิมพ์ลงบนเฟรมรูปที่ถ่าย (ฟอนต์อังกฤษ ภาษาไทยอาจแสดงไม่สวย)
+  // ข้อความท้ายเว็บ
+  footerText: "Made with love. Smile often.",
+  // ส่วนบริจาค: ข้อความ และชื่อปุ่ม
+  donateText: "This booth is free and run by one person. A small tip keeps it open.",
+  donateButtonLabel: "Leave me a tip", // ข้อความบนปุ่มบริจาค
+  donateUrl: "",                    // <-- ลิงก์บริจาค (ตอนนี้ปิดไว้) ถ้าอยากเปิดในอนาคต: ใส่ลิงก์ในเครื่องหมายคำพูด เช่น "https://ko-fi.com/ชื่อคุณ" ปุ่มจะกดได้ทันที ถ้าเว้นว่างไว้ ปุ่มจะแสดงอย่างเดียว กดไม่ได้
+  promptpayQr: "",                  // <-- ชื่อไฟล์รูป QR พร้อมเพย์ ที่วางไว้ในโฟลเดอร์ public เช่น "promptpay-qr.png" (เว้นว่างไว้ก่อนได้)
+  showEmptyQrSlot: true,            // true = ถ้ายังไม่ใส่ QR จะโชว์กรอบเส้นประรอไว้ / false = ซ่อนกรอบจนกว่าจะใส่ QR
+  recipientName: "",                // <-- ชื่อผู้รับเงิน เช่น "สมชาย ใจดี" (เว้นว่างไว้ = ไม่แสดงชื่อ)
+  bugEmail: "hello@example.com",                  // <-- อีเมลสำรอง: ใช้เมื่อส่งเข้าเซิร์ฟเวอร์ไม่ได้ ระบบจะเปิดแอปอีเมลไปที่นี่
+  timerOptions: [0, 3, 5],                        // ตัวเลือกนับถอยหลัง (วินาที) 0 = ถ่ายทันที เช่น แก้เป็น [0, 3, 10]
+  defaultTimer: 3,   // ค่านับถอยหลังเริ่มต้น (ต้องเป็นเลขที่มีใน timerOptions)
+  defaultFrame: "awning", // เฟรมเริ่มต้น ใส่ id ของเฟรม เช่น "none" "polaroid" "arch" "wave"
+  photoSize: [900, 1125]                          // ขนาดรูปที่บันทึก [กว้าง, สูง] เป็นพิกเซล (ถ้าเปลี่ยน เฟรมที่อัปโหลดต้องปรับขนาดตามด้วย)
+};
+
+/* =====================================================================
+   ส่วนที่ 3: FRAMES  เฟรมรูป (สำหรับนักพัฒนาเท่านั้น)
+   ผู้เข้าชมเลือกได้แค่เฟรมที่อยู่ในรายการนี้ ไม่มีปุ่มอัปโหลด/แก้ไขในหน้าเว็บ
+   ---------------------------------------------------------------------
+   วิธีเพิ่มเฟรมแบบที่ 1 (ง่ายสุด): เข้า /admin.html แล้วอัปโหลดไฟล์ PNG โปร่งใส
+   วิธีเพิ่มเฟรมแบบที่ 2 (เขียนโค้ดวาด): คัดลอกบล็อก { id:..., name:..., draw(){} } ด้านล่างมา 1 อัน
+        - id    = รหัสภาษาอังกฤษไม่ซ้ำกัน เช่น "heart"
+        - name  = ชื่อที่แสดงบนปุ่มเลือก เช่น "กรอบหัวใจ" (ภาษาไทยได้)
+        - draw  = โค้ดวาดลงผืนผ้าใบ c (ขนาด w x h)
+          col('--green') = ดึงสีจากส่วนที่ 1 มาใช้
+   วิธีลบเฟรม: ลบทั้งบล็อก { ... }, ของเฟรมนั้น (รวมเครื่องหมายจุลภาคท้ายบล็อก)
+   ===================================================================== */
+const FRAMES = [
+  // เฟรมที่ 1: ไม่ใส่เฟรม (ชื่อบนปุ่มแก้ที่ name)
+  { id:"none", name:"No frame", draw(){} },
+  // เฟรมที่ 2: กันสาดคาเฟ่ (แถบลายทางเขียวด้านบน แถบเขียวด้านล่างพร้อมชื่อร้าน)
+  { id:"awning", name:"Café awning", draw(c,w,h,col){
+      const s=w/18; c.fillStyle=col('--cream'); c.fillRect(0,0,w,h*.0); 
+      for(let i=0;i<18;i++){c.fillStyle=i%2?col('--cream'):col('--green');c.fillRect(i*s,0,s,70);c.beginPath();c.arc(i*s+s/2,70,s/2,0,Math.PI);c.fill();}
+      c.fillStyle=col('--green');c.fillRect(0,h-110,w,110);
+      for(let i=0;i<18;i++){if(i%2==0){c.fillStyle=col('--pink');c.fillRect(i*s,h-110,s,22);}}
+      c.fillStyle=col('--cream');c.textAlign='center';c.font='italic 600 52px "Cormorant Garamond",serif';c.fillText(CONFIG.captionOnFrames,w/2,h-38);
+      c.strokeStyle=col('--green');c.lineWidth=26;c.strokeRect(0,0,w,h);
+  }},
+  // เฟรมที่ 3: โพลารอยด์ (ขอบขาว ขอบล่างหนาพร้อมชื่อร้านลายมือ)
+  { id:"polaroid", name:"Polaroid", draw(c,w,h,col){
+      c.fillStyle='#fffdf8';c.beginPath();c.rect(0,0,w,h);c.rect(50,50,w-100,h-230);c.fill('evenodd');
+      c.fillStyle=col('--green');c.textAlign='center';c.font='400 72px "Pinyon Script",cursive';c.fillText(CONFIG.captionOnFrames,w/2,h-62);
+  }},
+  // เฟรมที่ 4: ซุ้มโค้งสีฟ้า-ม่วงไล่เฉด (รูปโผล่ในช่องโค้ง)
+  { id:"arch", name:"Dreamy arch", draw(c,w,h,col){
+      const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#bad0e0');g.addColorStop(1,'#e3d3e8');
+      c.fillStyle=g;c.beginPath();c.rect(0,0,w,h);
+      const x=90,y=90,ww=w-180,r=ww/2,b=h-220;
+      c.moveTo(x,b);c.lineTo(x,y+r);c.arc(w/2,y+r,r,Math.PI,0);c.lineTo(x+ww,b);c.closePath();c.fill('evenodd');
+      c.strokeStyle='#2a2a22';c.lineWidth=3;c.beginPath();c.moveTo(x,b);c.lineTo(x,y+r);c.arc(w/2,y+r,r,Math.PI,0);c.lineTo(x+ww,b);c.closePath();c.stroke();
+      c.fillStyle='#2a2a22';c.textAlign='center';c.font='400 64px "Pinyon Script",cursive';c.fillText(CONFIG.captionOnFrames,w/2,h-90);
+      c.font='28px serif';c.fillText('✦',110,150);c.fillText('✦',w-110,h-250);
+  }},
+  // เฟรมที่ 5: ขอบชมพูหยักเป็นคลื่น พร้อมป้ายชื่อสีขาว
+  { id:"wave", name:"Pink wave", draw(c,w,h,col){
+      c.fillStyle=col('--pink');c.beginPath();c.rect(0,0,w,h);
+      c.rect(50,50,w-100,h-100);c.fill('evenodd');
+      for(let i=0;i<16;i++){c.beginPath();c.arc(i*(w/15),38,34,0,7);c.arc(i*(w/15),h-38,34,0,7);c.fill();}
+      for(let i=0;i<20;i++){c.beginPath();c.arc(38,i*(h/19),34,0,7);c.arc(w-38,i*(h/19),34,0,7);c.fill();}
+      c.strokeStyle='#2a2a22';c.lineWidth=3;c.strokeRect(50,50,w-100,h-100);
+      c.fillStyle='#fff';c.strokeStyle='#2a2a22';c.lineWidth=2;c.beginPath();c.roundRect(w/2-190,h-120,380,76,38);c.fill();c.stroke();
+      c.fillStyle='#2a2a22';c.textAlign='center';c.font='italic 600 40px "Cormorant Garamond",serif';c.fillText(CONFIG.captionOnFrames,w/2,h-70);
+  }}
+];
+/* ฟิลเตอร์สี: id = รหัส, name = ชื่อบนปุ่ม, css = สูตรปรับสีภาพ (สูตรมาตรฐาน CSS filter)
+   เพิ่มใหม่ได้โดยคัดลอกบรรทัด {id:...} แล้วแก้ค่า เช่น 'sepia(.6)' = โทนวินเทจ */
+const FILTERS=[
+  {id:'none',name:'Natural',css:'none'},
+  {id:'rose',name:'Rosé',css:'sepia(.25) saturate(1.3) hue-rotate(-12deg) brightness(1.05)'},
+  {id:'soft',name:'Dreamy',css:'contrast(.9) brightness(1.12) saturate(.9) blur(.4px)'},
+  {id:'mono',name:'Noir',css:'grayscale(1) contrast(1.15)'}
+];
+
+/* =====================================================================
+   ส่วนที่ 4: ระบบการทำงาน (กล้อง นับถอยหลัง ถ่ายภาพ แกลเลอรี่ ส่งรายงานบัก)
+   ไม่ต้องแก้ส่วนนี้ ถ้าไม่มั่นใจ ให้เลื่อนผ่านไปได้เลย
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const [W,H]=CONFIG.photoSize;
+let stream=null,frame=CONFIG.defaultFrame,filter='none',timer=CONFIG.defaultTimer,busy=false,uploaded=null,shots=[];
+const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim()||'#fff';
+const toast=t=>{const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2600)};
+
+$('brandName').textContent=CONFIG.brandName;document.title=CONFIG.brandName+" Photo Booth";
+$('heroTitle').textContent=CONFIG.heroTitle;$('heroSub').textContent=CONFIG.heroSub;
+$('donateText').textContent=CONFIG.donateText;$('donateBtn').textContent=CONFIG.donateButtonLabel;
+/* ปุ่มบริจาค: มีลิงก์ = กดได้ / ไม่มีลิงก์ = แสดงเฉยๆ */
+if(CONFIG.donateUrl){$('donateBtn').href=CONFIG.donateUrl}else{$('donateBtn').setAttribute('aria-disabled','true')}
+/* QR พร้อมเพย์ */
+if(CONFIG.promptpayQr){const i=new Image();i.src=CONFIG.promptpayQr;i.alt='PromptPay QR code';
+  i.onerror=()=>{$('qrBox').textContent='QR image not found'};$('qrBox').appendChild(i);$('qrBox').hidden=false}
+else if(CONFIG.showEmptyQrSlot){$('qrBox').textContent='PromptPay QR coming soon';$('qrBox').classList.add('empty-slot');$('qrBox').hidden=false}
+/* ชื่อผู้รับเงิน */
+if(CONFIG.recipientName){$('payee').textContent=CONFIG.recipientName;$('payee').hidden=false}
+$('footer').textContent=CONFIG.footerText;
+
+function chips(id,items,get,set,label){
+  const box=$(id);box.innerHTML='';
+  items.forEach(it=>{const b=document.createElement('button');b.className='chip';b.textContent=label(it);
+    b.onclick=()=>{set(it);[...box.children].forEach((x,i)=>x.setAttribute('aria-pressed',items[i]===get()));if(id!=='timerChips')drawOverlay();};
+    b.setAttribute('aria-pressed',get()===it);box.appendChild(b)});
+}
+chips('frameChips',FRAMES.map(f=>f.id),()=>frame,v=>frame=v,id=>FRAMES.find(f=>f.id===id).name);
+chips('filterChips',FILTERS.map(f=>f.id),()=>filter,v=>{filter=v;$('video').style.filter=FILTERS.find(f=>f.id===v).css},id=>FILTERS.find(f=>f.id===id).name);
+chips('timerChips',CONFIG.timerOptions,()=>timer,v=>timer=v,s=>s?s+' sec':'Instant');
+
+function drawOverlay(){const o=$('overlay'),c=o.getContext('2d');c.clearRect(0,0,W,H);o.width=W;o.height=H;
+  const f=FRAMES.find(f=>f.id===frame);c.save();f.draw(c,W,H,col);c.restore();}
+document.fonts&&document.fonts.ready.then(drawOverlay);drawOverlay();
+
+$('camBtn').onclick=async()=>{
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;$('video').srcObject=null;$('shutter').disabled=!uploaded;$('camBtn').textContent='Start camera';$('empty').hidden=false;return}
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:1600}},audio:false});
+    $('video').srcObject=stream;$('video').hidden=false;$('still').hidden=true;uploaded=null;
+    $('empty').hidden=true;$('shutter').disabled=false;$('camBtn').textContent='Stop camera';$('camNote').textContent='';
+  }catch(e){$('camNote').textContent=(!window.isSecureContext||!navigator.mediaDevices)?"The camera needs a secure (https) connection. Open this site with https://, or upload a photo instead.":"Camera blocked. Click the camera icon in the address bar, choose Allow, then press Start camera again.";toast("Camera blocked")}
+};
+$('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const img=new Image();
+  img.onload=()=>{uploaded=img;const s=$('still');s.width=W;s.height=H;cover(s.getContext('2d'),img,img.width,img.height,false);s.hidden=false;$('video').hidden=true;$('empty').hidden=true;$('shutter').disabled=false;
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;$('camBtn').textContent='Start camera'}};
+  img.src=URL.createObjectURL(f);};
+
+function cover(c,src,sw,sh,mirror){
+  const r=Math.max(W/sw,H/sh),dw=sw*r,dh=sh*r;c.save();c.filter=FILTERS.find(f=>f.id===filter).css;
+  if(mirror){c.translate(W,0);c.scale(-1,1)}c.drawImage(src,(W-dw)/2,(H-dh)/2,dw,dh);c.restore();}
+
+$('shutter').onclick=async()=>{
+  if(busy)return;busy=true;$('shutter').disabled=true;
+  if(!uploaded&&timer){for(let i=timer;i>0;i--){$('count').textContent=i;await new Promise(r=>setTimeout(r,1000))}$('count').textContent=''}
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  if(uploaded)cover(x,uploaded,uploaded.width,uploaded.height,false);else{const v=$('video');cover(x,v,v.videoWidth,v.videoHeight,true)}
+  x.save();FRAMES.find(f=>f.id===frame).draw(x,W,H,col);x.restore();
+  const f=$('flash');f.style.transition='none';f.style.opacity=1;requestAnimationFrame(()=>{f.style.transition='opacity .45s';f.style.opacity=0});
+  shots.unshift(c.toDataURL('image/jpeg',.92));renderGallery();toast('Saved to your photos');
+  busy=false;$('shutter').disabled=false;
+};
+function renderGallery(){const g=$('gallery');g.innerHTML='';$('galleryEmpty').hidden=shots.length>0;
+  shots.forEach((s,i)=>{const d=document.createElement('div');d.className='shot';
+    d.innerHTML=`<img src="${s}" alt="Photo ${shots.length-i}"><div><a class="btn" download="photobooth-${shots.length-i}.jpg" href="${s}">Download</a><button>Delete</button></div>`;
+    d.querySelector('button').onclick=()=>{shots.splice(i,1);renderGallery()};g.appendChild(d)});}
+
+$('bugSend').onclick=async()=>{
+  const d=$('bugDesc').value.trim();if(!d){toast('Add a short description first');$('bugDesc').focus();return}
+  const body=`${d}\n\nReply-to: ${$('bugName').value||'not given'}\nBrowser: ${navigator.userAgent}\nScreen: ${innerWidth}x${innerHeight}`;
+  try{
+    const r=await fetch('/api/bug',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:$('bugType').value,description:d,email:$('bugName').value,ua:navigator.userAgent,screen:innerWidth+'x'+innerHeight})});
+    if(!r.ok)throw 0;$('bugDesc').value='';toast('Report sent. Thank you!');
+  }catch(e){
+    location.href=`mailto:${CONFIG.bugEmail}?subject=${encodeURIComponent('Bug: '+$('bugType').value)}&body=${encodeURIComponent(body)}`;
+    toast('Opening your email app');
+  }
+};
+
+/* โหลดเฟรมที่แอดมินอัปโหลดไว้ที่ /admin.html มาต่อท้ายรายการเฟรม (ผู้เข้าชมเลือกได้อย่างเดียว) */
+fetch('/api/frames').then(r=>r.ok?r.json():[]).then(list=>{
+  list.forEach(f=>{const img=new Image();img.src=f.url;
+    FRAMES.push({id:f.id,name:f.name,draw(c,w,h){if(img.complete)c.drawImage(img,0,0,w,h)}});
+    img.onload=drawOverlay;});
+  if(list.length)chips('frameChips',FRAMES.map(f=>f.id),()=>frame,v=>frame=v,id=>FRAMES.find(f=>f.id===id).name);
+}).catch(()=>{});
+</script>
+</body>
+</html>
