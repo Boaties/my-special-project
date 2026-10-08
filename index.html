@@ -224,7 +224,7 @@ footer{background:var(--green);color:var(--cream);text-align:center;padding:26px
 const CONFIG = {
   brandName: "GLAM CAM CLUB",   // ชื่อร้าน/ชื่อตู้ แสดงที่แถบหัวและชื่อแท็บ
   // ข้อความใหญ่ตอนต้อนรับ และข้อความรองด้านล่าง
-  heroTitle: "Say cheese, darling",
+  heroTitle: "Smile , My cuties",
   heroSub: "Step into our little striped booth. Pick a frame, strike a pose, keep the memory.",
   captionOnFrames: "GLAM CAM CLUB", // คำที่พิมพ์ลงบนเฟรมรูปที่ถ่าย (ฟอนต์อังกฤษ ภาษาไทยอาจแสดงไม่สวย)
   // ข้อความท้ายเว็บ
@@ -234,9 +234,9 @@ const CONFIG = {
   donateButtonLabel: "Leave me a tip", // ข้อความบนปุ่มบริจาค
   donateUrl: "",                    // <-- ลิงก์บริจาค (ตอนนี้ปิดไว้) ถ้าอยากเปิดในอนาคต: ใส่ลิงก์ในเครื่องหมายคำพูด เช่น "https://ko-fi.com/ชื่อคุณ" ปุ่มจะกดได้ทันที ถ้าเว้นว่างไว้ ปุ่มจะแสดงอย่างเดียว กดไม่ได้
   promptpayQr: "promptpay-qr.png",                  // <-- ชื่อไฟล์รูป QR พร้อมเพย์ ที่วางไว้ในโฟลเดอร์ public เช่น "promptpay-qr.png" (เว้นว่างไว้ก่อนได้)
-  showEmptyQrSlot: true,            // true = ถ้ายังไม่ใส่ QR จะโชว์กรอบเส้นประรอไว้ / false = ซ่อนกรอบจนกว่าจะใส่ QR
+  showEmptyQrSlot: false,            // true = ถ้ายังไม่ใส่ QR จะโชว์กรอบเส้นประรอไว้ / false = ซ่อนกรอบจนกว่าจะใส่ QR
   recipientName: "Akkaracha chantarasena",                // <-- ชื่อผู้รับเงิน เช่น "สมชาย ใจดี" (เว้นว่างไว้ = ไม่แสดงชื่อ)
-  bugEmail: "hello@example.com",                  // <-- อีเมลสำรอง: ใช้เมื่อส่งเข้าเซิร์ฟเวอร์ไม่ได้ ระบบจะเปิดแอปอีเมลไปที่นี่
+  bugEmail: "s.boataukaracha@gmail.com",                  // <-- อีเมลสำรอง: ใช้เมื่อส่งเข้าเซิร์ฟเวอร์ไม่ได้ ระบบจะเปิดแอปอีเมลไปที่นี่
   timerOptions: [0, 3, 5],                        // ตัวเลือกนับถอยหลัง (วินาที) 0 = ถ่ายทันที เช่น แก้เป็น [0, 3, 10]
   defaultTimer: 3,   // ค่านับถอยหลังเริ่มต้น (ต้องเป็นเลขที่มีใน timerOptions)
   defaultFrame: "awning", // เฟรมเริ่มต้น ใส่ id ของเฟรม เช่น "none" "polaroid" "arch" "wave"
